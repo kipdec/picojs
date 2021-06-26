@@ -6,6 +6,24 @@ import Cart from './classes/Cart';
 
 const filename = '../input/dungeongame.p8';
 
+const args = process.argv.slice(2);
+const arg = args[0];
+
+const processArgs = () =>{
+  switch(arg){
+    case 'unpack':
+      console.log('unpacking p8 file');
+      processFile();
+      break;
+    case 'pack':
+      console.log('not implemented');
+      pack();
+      break;
+    default:
+      console.log('unknown command');
+  }
+}
+
 const processFile = async () => {
   let currentSection = '';
   let lua: string[] = [];
@@ -82,10 +100,17 @@ const processFile = async () => {
   }
   //console.log({cart});
 
-  const cart2 = new Cart(cart);
+  const cart2 = new Cart('testing.p8', cart);
   cart2.generateSpriteSheet();
+  cart2.generateLua();
+  cart2.generateMap();
 
 }
 
-processFile();
+const pack = () => {
+  // read in lua
+  const cart = new Cart('testing.p8');
+  cart.pack();
+}
 
+processArgs();

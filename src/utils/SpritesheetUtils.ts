@@ -1,75 +1,114 @@
 import Jimp = require("jimp");
+import { join } from "path/posix";
 import Color from "../interfaces/Color";
 
-const colors: Color = {
-  0: {
+const colors: Color[] = [
+  {
+    num: 0,
     hex: 0x000000FF,
     name: 'black'
   },
-  1: {
+  {
+    num: 1,
     hex: 0x1D2B53FF,
     name: 'dark-blue'
   },
-  2: {
+  {
+    num: 2,
     hex: 0x7E2553FF,
     name: 'dark-purple'
   },
-  3: {
+  {
+    num: 3,
     hex: 0x008751FF,
     name: 'dark-green'
   },
-  4: {
+  {
+    num: 4,
     hex: 0xAB5236FF,
     name: 'brown'
   },
-  5: {
+  {
+    num: 5,
     hex: 0x5F574FFF,
     name: 'dark-grey'
   },
-  6: {
+  {
+    num: 6,
     hex: 0xC2C3C7FF,
     name: 'light-grey'
   },
-  7: {
+  {
+    num: 7,
     hex: 0xFFF1E8FF,
     name: 'white'
   },
-  8: {
+  {
+    num: 8,
     hex: 0xFF004DFF,
     name: 'red'
   },
-  9: {
+  {
+    num: 9,
     hex: 0xFFA300FF,
     name: 'orange'
   },
-  10: {
+  {
+    num: 10,
     hex: 0xFFEC27FF,
     name: 'yellow'
   },
-  11: {
+  {
+    num: 11,
     hex: 0x00E436FF,
     name: 'green'
   },
-  12: {
+  {
+    num: 12,
     hex: 0x29ADFFFF,
     name: 'blue'
   },
-  13: {
+  {
+    num: 13,
     hex: 0x83769CFF,
     name: 'lavender'
   },
-  14: {
+  {
+    num: 14,
     hex: 0xFF77A8FF,
     name: 'pink'
   },
-  15: {
+  {
+    num: 15,
     hex: 0xFFCCAAFF,
     name: 'light-peach'
   }
+]
+
+const getColor = (n: number) : { hex: number, name: string } => {
+  return colors.filter(c => c.num == n)[0];
 }
 
-const getColor = (c: number) : { hex: number, name: string } => {
-  return colors[c];
+const getNumber = (hex: number) : number => {
+  return colors.filter(c => c.hex == hex)[0].num;
+}
+
+const createLinesFromImage = async (imagePath: string): Promise<string[]> => {
+  console.log({imagePath});
+  console.log({'currentdir': __dirname})
+  const jimg = await Jimp.read(imagePath);
+  const lines: string[] = [];
+  console.log({jimg});
+  for(let y = 0; y < 128; y++){
+    const nums: number[] = [];
+    for(let x = 0; x < 128; x++){
+      const num = getNumber(jimg.getPixelColor(x,y));
+      nums.push(num);
+    }
+    lines.push(nums.map(n => n.toString()).join(''));
+  }
+
+  return lines;
 }
 
 const createImageFromLines = (lines: string[]): Jimp => {
@@ -86,5 +125,6 @@ const createImageFromLines = (lines: string[]): Jimp => {
 
 export {
   getColor,
-  createImageFromLines
+  createImageFromLines,
+  createLinesFromImage,
 }
