@@ -80,19 +80,15 @@ const getColor = (c: number) : { hex: number, name: string } => {
   return colors[c];
 }
 
-var jimg = new Jimp(128,128, 0x000000FF); const makeImage = (lines: string[]) => {
-  for(let yindex = 0; yindex < lines.length; yindex++){
-    for(let i = 0; i < 128; i++){
-      const color = getColor(parseInt(lines[yindex].charAt(i)));
-      console.log({hex: color.hex})
-      const val = color.hex.toString(16);
-
-      console.log({val});
-      jimg.setPixelColor(parseInt(val, 16), i, yindex);
+var jimg = new Jimp(128,128, 0x000000FF); 
+const makeImage = (lines: string[], filename: string) => {
+  for(let y = 0; y < lines.length; y++){
+    for(let x = 0; x < 128; x++){
+      const color = getColor(parseInt(lines[y].charAt(x)));
+      jimg.setPixelColor(color.hex, x, y);
     }
   }
-  //jimg.colorType(0);
-  jimg.write('test.png');
+  jimg.write(filename);
 }
 
 const processFile = async () => {
@@ -161,7 +157,7 @@ const processFile = async () => {
     }
   }
   
-  makeImage(spritesheet);
+  makeImage(spritesheet, 'testingfilename.png');
 
   const cart: CartInterface = {
     lua,
