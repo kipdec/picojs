@@ -3,6 +3,8 @@ import CartInterface from "../interfaces/CartInterface";
 import { createImageFromLines, createLinesFromImage } from '../utils/SpritesheetUtils';
 const fs = require('fs');
 
+const emptyLine = '00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000';
+
 const stringToNumberArray = (str: string) : number[] => {
   const numArray = str.split('').map(c => parseInt(c));
   return numArray;
@@ -31,7 +33,7 @@ class Cart {
     this.filename = filename;
     if(!data){
       data = {
-        lua: [],
+        lua: [`--${this.filename}--`],
         spritesheet: [],
         map: [],
         spriteflags: [],
@@ -43,9 +45,20 @@ class Cart {
     this.data = data;
   }
 
-  generateSpriteSheet(){
+  unpack = async() => {
+    this.generateLua();
+    this.generateLabel();
+    await this.generateSpriteSheet();
+    this.generateSpriteFlags();
+    this.generateMap();
+    this.generateSFX();
+    this.generateMusic();
+  }
+
+  generateSpriteSheet = async () =>{
     const image = createImageFromLines(this.data.spritesheet);
-    image.write(path.join(this.baseDir, `src/spritesheet/${this.filename.slice(0, -3)}_ss.png`));
+    // prune the unused images
+    await image.writeAsync(path.join(this.baseDir, `src/spritesheet/${this.filename.slice(0, -3)}_ss.png`));
   }
 
   generateLua(){
@@ -86,7 +99,11 @@ class Cart {
   readIn = async () => {
     this.data.lua = fs.readFileSync(path.join(this.baseDir, `src/lua/${this.filename.slice(0,-3)}.lua`), {encoding: 'utf8', flag: 'r'}).split('\n');
 
-    this.data.spritesheet = await createLinesFromImage(path.join(this.baseDir, 'src/spritesheet', `${this.filename.slice(0,-3)}_ss.png`));
+    const spritesheet = await createLinesFromImage(path.join(this.baseDir, 'src/spritesheet', `${this.filename.slice(0,-3)}_ss.png`));
+    // prune unused lines
+    while(spritesheet.slice(-1)[0] == emptyLine) spritesheet.pop();
+
+    this.data.spritesheet = spritesheet;
 
     this.readSpriteFlags();
     this.readMap();
@@ -129,7 +146,7 @@ class Cart {
     // Create a backup
     const date = new Date().toLocaleTimeString();
     fs.mkdirSync(path.join(this.baseDir, 'backup'), {recursive: true});
-    fs.copyFileSync(path.join(this.baseDir, this.filename), path.join(this.baseDir, 'backup', `${this.filename.slice(0,-3)}-${date}.p8`));
+    if(fs.existsSync(path.join(this.baseDir, this.filename))) fs.copyFileSync(path.join(this.baseDir, this.filename), path.join(this.baseDir, 'backup', `${this.filename.slice(0,-3)}-${date}.p8`));
     
     await this.readIn();
     const outFile: string[] = [];

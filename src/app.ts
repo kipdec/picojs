@@ -5,6 +5,7 @@ import CartInterface from './interfaces/CartInterface';
 import Cart from './classes/Cart';
 import path = require('path');
 import { exit } from 'process';
+import { dirname } from 'path/posix';
 
 const filename = '../input/dungeongame.p8';
 
@@ -25,9 +26,22 @@ const processArgs = () =>{
       pack();
       console.log('packed!');
       break;
+    case 'init':
+      init();
+      break;
     default:
       console.log('unknown command');
   }
+}
+
+const init = async () => {
+  const dirName = baseDir.split('/').slice(-1)[0];
+  const cart = new Cart(baseDir, `${dirName}.p8`);
+  mkdirs();
+  console.log("unpacking")
+  await cart.unpack();
+  console.log('packing');
+  await cart.pack();
 }
 
 const getP8File = (): string | undefined => {
@@ -43,6 +57,17 @@ const getP8File = (): string | undefined => {
   }
 
   return p8files[0];
+}
+
+const mkdirs = () => {
+  fs.mkdirSync(path.join(baseDir, 'src'), {recursive: true});
+  fs.mkdirSync(path.join(baseDir, 'src/lua'), {recursive: true});
+  fs.mkdirSync(path.join(baseDir, 'src/spritesheet'), {recursive: true});
+  fs.mkdirSync(path.join(baseDir, 'src/spriteflags'), {recursive: true});
+  fs.mkdirSync(path.join(baseDir, 'src/label'), {recursive: true});
+  fs.mkdirSync(path.join(baseDir, 'src/map'), {recursive: true});
+  fs.mkdirSync(path.join(baseDir, 'src/sfx'), {recursive: true});
+  fs.mkdirSync(path.join(baseDir, 'src/music'), {recursive: true});
 }
 
 const unpack = async () => {

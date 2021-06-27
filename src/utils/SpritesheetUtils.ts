@@ -95,6 +95,7 @@ const getNumber = (hex: number) : number => {
 
 const createLinesFromImage = async (imagePath: string): Promise<string[]> => {
   const jimg = await Jimp.read(imagePath);
+  console.log('read?');
   const lines: string[] = [];
   for(let y = 0; y < 128; y++){
     const nums: number[] = [];
