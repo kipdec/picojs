@@ -1,3 +1,4 @@
+import path = require("path");
 import CartInterface from "../interfaces/CartInterface";
 import { createImageFromLines, createLinesFromImage } from '../utils/SpritesheetUtils';
 const fs = require('fs');
@@ -20,7 +21,9 @@ const spritesheetHeader = '__gfx__';
 class Cart {
   data: CartInterface;
   filename: string;
-  constructor(filename: string, data?: CartInterface){
+  baseDir: string;
+  constructor(baseDir: string, filename: string, data?: CartInterface){
+    this.baseDir = baseDir
     this.filename = filename;
     if(!data){
       data = {
@@ -29,7 +32,8 @@ class Cart {
         map: [],
         spriteflags: [],
         label: [],
-        music: []
+        music: [],
+        sfx: []
       }
     }
     this.data = data;
@@ -37,18 +41,18 @@ class Cart {
 
   generateSpriteSheet(){
     const image = createImageFromLines(this.data.spritesheet);
-    image.write('./output/spritesheet/spritesheet.png');
+    image.write(path.join(this.baseDir, `src/spritesheet/${this.filename.slice(0, -3)}_ss.png`));
   }
 
   generateLua(){
     const lua = this.data.lua.join('\n');
-    fs.writeFileSync('./output/lua/lua.lua', lua);
+    fs.writeFileSync(path.join(this.baseDir, `src/lua/${this.filename.slice(0,-3)}.lua`), lua);
   }
 
   generateMap(){
     const array: number[][] = [];
     this.data.map.forEach(s => array.push(stringToNumberArray(s)));
-    fs.writeFileSync('./output/map/map.json', JSON.stringify(array));
+    fs.writeFileSync(path.join(this.baseDir, `src/map/${this.filename.slice(0,-3)}_map.json`), JSON.stringify(array));
   }
 
   readIn = async () => {

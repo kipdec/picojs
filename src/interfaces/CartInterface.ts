@@ -5,6 +5,7 @@ interface CartInterface {
   label: string[];
   map: string[];
   music: string[];
+  sfx: string[];
 }
 
 export default CartInterface;

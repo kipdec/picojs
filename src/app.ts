@@ -3,17 +3,20 @@ import * as fs from 'fs';
 import * as readline from 'readline';
 import CartInterface from './interfaces/CartInterface';
 import Cart from './classes/Cart';
+import path = require('path');
 
 const filename = '../input/dungeongame.p8';
 
 const args = process.argv.slice(2);
 const arg = args[0];
 
+const baseDir = __dirname;
+
 const processArgs = () =>{
   switch(arg){
     case 'unpack':
       console.log('unpacking p8 file');
-      processFile();
+      unpack();
       break;
     case 'pack':
       console.log('not implemented');
@@ -24,53 +27,77 @@ const processArgs = () =>{
   }
 }
 
-const processFile = async () => {
+const unpack = async () => {
+  // Check to make sure p8 file is in folder
+  var files = fs.readdirSync(baseDir);
+  const p8files = files.filter(f => f.endsWith('.p8'));
+  if(p8files.length == 0){
+    console.log('No valid p8 file found');
+    return;
+  }
+  if(p8files.length > 1){
+    console.log('This program is designed to work with one (1) .p8 file per directory');
+  }
+
+  const p8fileName = p8files[0];
+  
+  // Ensure that src and subfolders exist
+  fs.mkdirSync(path.join(baseDir, 'src'), {recursive: true});
+  fs.mkdirSync(path.join(baseDir, 'src/lua'), {recursive: true});
+  fs.mkdirSync(path.join(baseDir, 'src/map'), {recursive: true});
+  fs.mkdirSync(path.join(baseDir, 'src/spritesheet'), {recursive: true});
+
+  await processFile(p8fileName);
+}
+const getSection = (line: string): string | undefined =>{
+  switch(line){
+    case "__lua__":
+      return "LUA";
+    case "__gfx__":
+      return "GFX";
+    case "__gff__":
+      return "GFF";
+    case "__label__":
+      return "LABEL";
+    case "__map__":
+      return "MAP";
+    case "__sfx__":
+      return "SFX";
+    case "__music__":
+      return "MUSIC";
+    default:
+      return undefined;
+  }
+}
+const addLineToCartInterface = (section: string, line: string, data: CartInterface) => {
+  switch(section){
+    case "LUA": data.lua.push(line); break;
+    case "GFX": data.spritesheet.push(line); break;
+    case "GFF": data.spriteflags.push(line); break;
+    case "LABEL": data.label.push(line); break;
+    case "MAP": data.map.push(line); break;
+    case "SFX": data.sfx.push(line); break;
+    case "MUSIC": data.music.push(line); break;
+  }
+}
+const processFile = async (filename) => {
   let currentSection = '';
-  let lua: string[] = [];
-  let spritesheet: string[] = [];
-  let spriteflags: string[] = [];
-  let label: string[] = [];
-  let map: string[] = [];
-  let sfx: string[] = [];
-  let music: string[] = [];
-
-  const getSection = (line: string): string | undefined =>{
-    switch(line){
-      case "__lua__":
-        return "LUA";
-      case "__gfx__":
-        return "GFX";
-      case "__gff__":
-        return "GFF";
-      case "__label__":
-        return "LABEL";
-      case "__map__":
-        return "MAP";
-      case "__sfx__":
-        return "SFX";
-      case "__music__":
-        return "MUSIC";
-      default:
-        return undefined;
-    }
-  }
-
-  const addToSection = (section: string, line: string) => {
-    switch(section){
-      case "LUA": lua.push(line); break;
-      case "GFX": spritesheet.push(line); break;
-      case "GFF": spriteflags.push(line); break;
-      case "LABEL": label.push(line); break;
-      case "MAP": map.push(line); break;
-      case "SFX": sfx.push(line); break;
-      case "MUSIC": music.push(line); break;
-    }
-  }
+  
   const fileStream = fs.createReadStream(filename);
   const rl = readline.createInterface({
     input: fileStream,
     crlfDelay: Infinity
   });
+
+  const data: CartInterface = {
+    lua: [],
+    spritesheet: [],
+    spriteflags: [],
+    label: [],
+    map: [],
+    music: [],
+    sfx: []
+  }
 
   let sectionFound = false;
   for await(const line of rl){
@@ -85,31 +112,21 @@ const processFile = async () => {
       }
 
       if(currentSection != '' && !newSection){
-        addToSection(currentSection, line);
+        addLineToCartInterface(currentSection, line, data);
       }
     }
   }
 
-  const cart: CartInterface = {
-    lua,
-    spritesheet,
-    spriteflags,
-    label,
-    map,
-    music
-  }
-  //console.log({cart});
-
-  const cart2 = new Cart('testing.p8', cart);
-  cart2.generateSpriteSheet();
-  cart2.generateLua();
-  cart2.generateMap();
+  const cart = new Cart(baseDir, filename, data);
+  cart.generateSpriteSheet();
+  cart.generateLua();
+  cart.generateMap();
 
 }
 
 const pack = () => {
   // read in lua
-  const cart = new Cart('testing.p8');
+  const cart = new Cart(baseDir, 'testing.p8');
   cart.pack();
 }
 
