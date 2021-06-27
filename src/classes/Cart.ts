@@ -17,6 +17,10 @@ const header = 'pico-8 cartridge // http://www.pico-8.com\nversion 32'
 const luaHeader = '__lua__';
 const mapHeader = '__map__';
 const spritesheetHeader = '__gfx__';
+const spriteflagsHeader = '__gff__';
+const labelHeader = '__label__';
+const sfxHeader = '__sfx__';
+const musicHeader = '__music__';
 
 class Cart {
   data: CartInterface;
@@ -49,10 +53,34 @@ class Cart {
     fs.writeFileSync(path.join(this.baseDir, `src/lua/${this.filename.slice(0,-3)}.lua`), lua);
   }
 
+  generateSpriteFlags(){     
+    const array: number[][] = [];
+    this.data.spriteflags.forEach(s => array.push(stringToNumberArray(s)));
+    fs.writeFileSync(path.join(this.baseDir, `src/spriteflags/${this.filename.slice(0,-3)}_sf.json`), JSON.stringify(array));
+  }
+
+  generateLabel(){     
+    const array: number[][] = [];
+    this.data.label.forEach(s => array.push(stringToNumberArray(s)));
+    fs.writeFileSync(path.join(this.baseDir, `src/label/${this.filename.slice(0,-3)}_label.json`), JSON.stringify(array));
+  }
+
   generateMap(){
     const array: number[][] = [];
     this.data.map.forEach(s => array.push(stringToNumberArray(s)));
     fs.writeFileSync(path.join(this.baseDir, `src/map/${this.filename.slice(0,-3)}_map.json`), JSON.stringify(array));
+  }
+  
+  generateSFX(){     
+    const array: number[][] = [];
+    this.data.sfx.forEach(s => array.push(stringToNumberArray(s)));
+    fs.writeFileSync(path.join(this.baseDir, `src/sfx/${this.filename.slice(0,-3)}_sfx.json`), JSON.stringify(array));
+  }
+
+  generateMusic(){     
+    const array: number[][] = [];
+    this.data.music.forEach(s => array.push(stringToNumberArray(s)));
+    fs.writeFileSync(path.join(this.baseDir, `src/music/${this.filename.slice(0,-3)})_music.json`), JSON.stringify(array));
   }
 
   readIn = async () => {
@@ -63,7 +91,6 @@ class Cart {
     const mapFile = fs.readFileSync(path.join(this.baseDir, 'src/map', `${this.filename.slice(0,-3)}_map.json`), {encoding: 'utf8', flag: 'r'});
     const mapArray: number[][] = JSON.parse(mapFile);
     this.data.map = mapArray.map(a => numberArrayToString(a));
-    console.log(this);
   }
 
   pack = async () => {
@@ -77,11 +104,30 @@ class Cart {
     outFile.push(header);
     outFile.push(luaHeader);
     outFile.push(...this.data.lua);
-    outFile.push(spritesheetHeader);
-    outFile.push(...this.data.spritesheet);
-    outFile.push(mapHeader);
-    outFile.push(...this.data.map);
-    console.log(outFile);
+    if(this.data.spritesheet.length > 0){
+      outFile.push(spritesheetHeader);
+      outFile.push(...this.data.spritesheet);
+    }
+    if(this.data.spriteflags.length > 0){
+      outFile.push(spriteflagsHeader);
+      outFile.push(...this.data.spriteflags);
+    }
+    if(this.data.label.length > 0){
+      outFile.push(labelHeader);
+      outFile.push(...this.data.label);
+    }
+    if(this.data.map.length > 0){
+      outFile.push(mapHeader);
+      outFile.push(...this.data.map);
+    }
+    if(this.data.sfx.length > 0){
+      outFile.push(sfxHeader);
+      outFile.push(...this.data.sfx);
+    }
+    if(this.data.music.length > 0){
+      outFile.push(musicHeader);
+      outFile.push(...this.data.music);
+    }
 
     fs.writeFileSync(this.filename, outFile.join('\n'));
   }

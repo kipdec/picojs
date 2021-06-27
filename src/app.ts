@@ -53,8 +53,12 @@ const unpack = async () => {
   // Ensure that src and subfolders exist
   fs.mkdirSync(path.join(baseDir, 'src'), {recursive: true});
   fs.mkdirSync(path.join(baseDir, 'src/lua'), {recursive: true});
-  fs.mkdirSync(path.join(baseDir, 'src/map'), {recursive: true});
   fs.mkdirSync(path.join(baseDir, 'src/spritesheet'), {recursive: true});
+  fs.mkdirSync(path.join(baseDir, 'src/spriteflags'), {recursive: true});
+  fs.mkdirSync(path.join(baseDir, 'src/label'), {recursive: true});
+  fs.mkdirSync(path.join(baseDir, 'src/map'), {recursive: true});
+  fs.mkdirSync(path.join(baseDir, 'src/sfx'), {recursive: true});
+  fs.mkdirSync(path.join(baseDir, 'src/music'), {recursive: true});
 
   await processFile(p8fileName);
 }
@@ -127,9 +131,13 @@ const processFile = async (filename) => {
   }
 
   const cart = new Cart(baseDir, filename, data);
-  cart.generateSpriteSheet();
   cart.generateLua();
+  cart.generateSpriteSheet();
+  cart.generateSpriteFlags();
+  cart.generateLabel();
   cart.generateMap();
+  cart.generateSFX();
+  cart.generateMusic();
 
 }
 
