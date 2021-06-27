@@ -1,4 +1,4 @@
-// read in the file
+#!/usr/bin/env node
 import * as fs from 'fs';
 import * as readline from 'readline';
 import CartInterface from './interfaces/CartInterface';
@@ -10,17 +10,20 @@ const filename = '../input/dungeongame.p8';
 const args = process.argv.slice(2);
 const arg = args[0];
 
-const baseDir = __dirname;
+const baseDir = process.cwd();
+console.log({baseDir});
 
 const processArgs = () =>{
   switch(arg){
     case 'unpack':
-      console.log('unpacking p8 file');
+      console.log('unpacking p8 file...');
       unpack();
+      console.log('unpacked!')
       break;
     case 'pack':
-      console.log('not implemented');
+      console.log('packing p8 file...')
       pack();
+      console.log('packed!');
       break;
     default:
       console.log('unknown command');

@@ -6,5 +6,8 @@
   "dependencies": {
     "image-output": "^2.4.2",
     "jimp": "^0.16.1"
+  },
+  "bin":{
+    "picojs":"dest/app.js"
   }
 }
