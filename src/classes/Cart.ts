@@ -56,17 +56,22 @@ class Cart {
   }
 
   readIn = async () => {
-    this.data.lua = fs.readFileSync('./output/lua/lua.lua', {encoding: 'utf8', flag: 'r'}).split('\n');
+    this.data.lua = fs.readFileSync(path.join(this.baseDir, `src/lua/${this.filename.slice(0,-3)}.lua`), {encoding: 'utf8', flag: 'r'}).split('\n');
 
-    this.data.spritesheet = await createLinesFromImage(__dirname + '/../output/spritesheet/spritesheet.png');
+    this.data.spritesheet = await createLinesFromImage(path.join(this.baseDir, 'src/spritesheet', `${this.filename.slice(0,-3)}_ss.png`));
 
-    const mapFile = fs.readFileSync('./output/map/map.json', {encoding: 'utf8', flag: 'r'});
+    const mapFile = fs.readFileSync(path.join(this.baseDir, 'src/map', `${this.filename.slice(0,-3)}_map.json`), {encoding: 'utf8', flag: 'r'});
     const mapArray: number[][] = JSON.parse(mapFile);
     this.data.map = mapArray.map(a => numberArrayToString(a));
     console.log(this);
   }
 
   pack = async () => {
+    // Create a backup
+    const date = new Date().toLocaleTimeString();
+    fs.mkdirSync(path.join(this.baseDir, 'backup'), {recursive: true});
+    fs.copyFileSync(path.join(this.baseDir, this.filename), path.join(this.baseDir, 'backup', `${this.filename.slice(0,-3)}-${date}.p8`));
+    
     await this.readIn();
     const outFile: string[] = [];
     outFile.push(header);
@@ -76,6 +81,7 @@ class Cart {
     outFile.push(...this.data.spritesheet);
     outFile.push(mapHeader);
     outFile.push(...this.data.map);
+    console.log(outFile);
 
     fs.writeFileSync(this.filename, outFile.join('\n'));
   }

@@ -4,6 +4,7 @@ import * as readline from 'readline';
 import CartInterface from './interfaces/CartInterface';
 import Cart from './classes/Cart';
 import path = require('path');
+import { exit } from 'process';
 
 const filename = '../input/dungeongame.p8';
 
@@ -30,9 +31,8 @@ const processArgs = () =>{
   }
 }
 
-const unpack = async () => {
-  // Check to make sure p8 file is in folder
-  var files = fs.readdirSync(baseDir);
+const getP8File = (): string | undefined => {
+   var files = fs.readdirSync(baseDir);
   const p8files = files.filter(f => f.endsWith('.p8'));
   if(p8files.length == 0){
     console.log('No valid p8 file found');
@@ -40,10 +40,16 @@ const unpack = async () => {
   }
   if(p8files.length > 1){
     console.log('This program is designed to work with one (1) .p8 file per directory');
+    return;
   }
 
-  const p8fileName = p8files[0];
-  
+  return p8files[0];
+}
+
+const unpack = async () => {
+  // Check to make sure p8 file is in folder
+  const p8fileName = getP8File(); 
+  if(!p8fileName) exit(1);
   // Ensure that src and subfolders exist
   fs.mkdirSync(path.join(baseDir, 'src'), {recursive: true});
   fs.mkdirSync(path.join(baseDir, 'src/lua'), {recursive: true});
@@ -129,7 +135,10 @@ const processFile = async (filename) => {
 
 const pack = () => {
   // read in lua
-  const cart = new Cart(baseDir, 'testing.p8');
+  // Ensure that p8 file exists
+  const p8fileName = getP8File();
+  if(!p8fileName) exit(1);
+  const cart = new Cart(baseDir, p8fileName);
   cart.pack();
 }
 
