@@ -36,4 +36,4 @@ To pack, simply: `picojs pack` in the folder containing your .p8 file.
 
 ### Init: `picojs init`
 
-Not yet implemented...
+Will create a new .p8 file as well as the subfolders and files created by the `unpack` command. The .p8 file will be named the directory name. E.g. if you run `picojs init` in a directory named `dungeongame` then the created .p8 file will be `dungeongame.p8`.
