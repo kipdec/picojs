@@ -80,7 +80,7 @@ class Cart {
   generateMusic(){     
     const array: number[][] = [];
     this.data.music.forEach(s => array.push(stringToNumberArray(s)));
-    fs.writeFileSync(path.join(this.baseDir, `src/music/${this.filename.slice(0,-3)})_music.json`), JSON.stringify(array));
+    fs.writeFileSync(path.join(this.baseDir, `src/music/${this.filename.slice(0,-3)}_music.json`), JSON.stringify(array));
   }
 
   readIn = async () => {
@@ -88,7 +88,39 @@ class Cart {
 
     this.data.spritesheet = await createLinesFromImage(path.join(this.baseDir, 'src/spritesheet', `${this.filename.slice(0,-3)}_ss.png`));
 
+    this.readSpriteFlags();
+    this.readMap();
+    this.readLabel()
+    this.readSFX();
+    this.readMusic();
+  }
+
+  readSpriteFlags = () => {
+    const mapFile = fs.readFileSync(path.join(this.baseDir, 'src/spriteflags', `${this.filename.slice(0,-3)}_sf.json`), {encoding: 'utf8', flag: 'r'});
+    const mapArray: number[][] = JSON.parse(mapFile);
+    this.data.map = mapArray.map(a => numberArrayToString(a));
+  }
+
+  readLabel = () => {
+    const mapFile = fs.readFileSync(path.join(this.baseDir, 'src/label', `${this.filename.slice(0,-3)}_label.json`), {encoding: 'utf8', flag: 'r'});
+    const mapArray: number[][] = JSON.parse(mapFile);
+    this.data.map = mapArray.map(a => numberArrayToString(a));
+  }
+
+  readMap = () => {
     const mapFile = fs.readFileSync(path.join(this.baseDir, 'src/map', `${this.filename.slice(0,-3)}_map.json`), {encoding: 'utf8', flag: 'r'});
+    const mapArray: number[][] = JSON.parse(mapFile);
+    this.data.map = mapArray.map(a => numberArrayToString(a));
+  }
+
+  readSFX = () => {
+    const mapFile = fs.readFileSync(path.join(this.baseDir, 'src/sfx', `${this.filename.slice(0,-3)}_sfx.json`), {encoding: 'utf8', flag: 'r'});
+    const mapArray: number[][] = JSON.parse(mapFile);
+    this.data.map = mapArray.map(a => numberArrayToString(a));
+  }
+
+  readMusic = () => {
+    const mapFile = fs.readFileSync(path.join(this.baseDir, 'src/music', `${this.filename.slice(0,-3)}_music.json`), {encoding: 'utf8', flag: 'r'});
     const mapArray: number[][] = JSON.parse(mapFile);
     this.data.map = mapArray.map(a => numberArrayToString(a));
   }
