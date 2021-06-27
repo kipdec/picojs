@@ -3,3 +3,4 @@ dest/*
 *.png
 *.js
 input/*
+.DS_Store
