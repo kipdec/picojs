@@ -113,7 +113,7 @@ const createImageFromLines = (lines: string[]): Jimp => {
   const jimg = new Jimp(128,128, 0x000000FF); 
   for(let y = 0; y < lines.length; y++){
     for(let x = 0; x < 128; x++){
-      const color = getColor(parseInt(lines[y].charAt(x)));
+      const color = getColor(parseInt(`0x${lines[y].charAt(x)}`));
       jimg.setPixelColor(color.hex, x, y);
     }
   }
