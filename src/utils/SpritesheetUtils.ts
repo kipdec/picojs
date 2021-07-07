@@ -93,17 +93,23 @@ const getNumber = (hex: number) : number => {
   return colors.filter(c => c.hex == hex)[0].num;
 }
 
+const decToPicoHex = (num: number) : string => {
+  var hex = Number(num).toString(16);
+  return hex;
+}
+
 const createLinesFromImage = async (imagePath: string): Promise<string[]> => {
   const jimg = await Jimp.read(imagePath);
   console.log('read?');
   const lines: string[] = [];
   for(let y = 0; y < 128; y++){
-    const nums: number[] = [];
+    const nums: string[] = [];
     for(let x = 0; x < 128; x++){
       const num = getNumber(jimg.getPixelColor(x,y));
-      nums.push(num);
+      const hex =  decToPicoHex(num);
+      nums.push(hex);
     }
-    lines.push(nums.map(n => n.toString()).join(''));
+    lines.push(nums.join(''));
   }
 
   return lines;
