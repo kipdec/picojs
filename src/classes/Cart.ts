@@ -6,7 +6,7 @@ const fs = require('fs');
 const emptyLine = '00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000';
 
 const stringToNumberArray = (str: string) : number[] => {
-  const numArray = str.split('').map(c => parseInt(c));
+  const numArray = str.split('').map(c => parseInt(`0x${c}`));
   return numArray;
 }
 
