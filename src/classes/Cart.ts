@@ -7,12 +7,19 @@ const fs = require('fs');
 const emptyLine = '00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000';
 
 const stringToNumberArray = (str: string) : number[] => {
-  const numArray = str.split('').map(c => parseInt(`0x${c}`));
+  const numArray = str.split('').map(c => {
+    var num = parseInt(`0x${c}`)
+    return num;
+  });
   return numArray;
 }
 
 const numberArrayToString = (numberArray: number[]) : string => {
-  const result = numberArray.map(n => n.toString(16)).join('');
+  const result = numberArray.map(n => {
+    var num = ' ';
+    if(n != null) num = n.toString(16);
+    return num;
+  }).join('');
   return result;
 }
 
