@@ -1,4 +1,5 @@
 import path = require("path");
+import { parse } from "path/posix";
 import CartInterface from "../interfaces/CartInterface";
 import { createImageFromLines, createLinesFromImage } from '../utils/SpritesheetUtils';
 const fs = require('fs');
@@ -11,7 +12,7 @@ const stringToNumberArray = (str: string) : number[] => {
 }
 
 const numberArrayToString = (numberArray: number[]) : string => {
-  const result = numberArray.map(n => n.toString()).join('');
+  const result = numberArray.map(n => n.toString(16)).join('');
   return result;
 }
 
@@ -113,33 +114,34 @@ class Cart {
   }
 
   readSpriteFlags = () => {
-    const mapFile = fs.readFileSync(path.join(this.baseDir, 'src/spriteflags', `${this.filename.slice(0,-3)}_sf.json`), {encoding: 'utf8', flag: 'r'});
-    const mapArray: number[][] = JSON.parse(mapFile);
-    this.data.map = mapArray.map(a => numberArrayToString(a));
+    const sfFile = fs.readFileSync(path.join(this.baseDir, 'src/spriteflags', `${this.filename.slice(0,-3)}_sf.json`), {encoding: 'utf8', flag: 'r'});
+    const sfArray: number[][] = JSON.parse(sfFile);
+    this.data.spriteflags = sfArray.map(a => numberArrayToString(a));
   }
 
   readLabel = () => {
-    const mapFile = fs.readFileSync(path.join(this.baseDir, 'src/label', `${this.filename.slice(0,-3)}_label.json`), {encoding: 'utf8', flag: 'r'});
-    const mapArray: number[][] = JSON.parse(mapFile);
-    this.data.map = mapArray.map(a => numberArrayToString(a));
+    const labelFile = fs.readFileSync(path.join(this.baseDir, 'src/label', `${this.filename.slice(0,-3)}_label.json`), {encoding: 'utf8', flag: 'r'});
+    const labelArray: number[][] = JSON.parse(labelFile);
+    this.data.label = labelArray.map(a => numberArrayToString(a));
   }
 
   readMap = () => {
     const mapFile = fs.readFileSync(path.join(this.baseDir, 'src/map', `${this.filename.slice(0,-3)}_map.json`), {encoding: 'utf8', flag: 'r'});
+    console.log({mapFile});
     const mapArray: number[][] = JSON.parse(mapFile);
     this.data.map = mapArray.map(a => numberArrayToString(a));
   }
 
   readSFX = () => {
-    const mapFile = fs.readFileSync(path.join(this.baseDir, 'src/sfx', `${this.filename.slice(0,-3)}_sfx.json`), {encoding: 'utf8', flag: 'r'});
-    const mapArray: number[][] = JSON.parse(mapFile);
-    this.data.map = mapArray.map(a => numberArrayToString(a));
+    const sfxFile = fs.readFileSync(path.join(this.baseDir, 'src/sfx', `${this.filename.slice(0,-3)}_sfx.json`), {encoding: 'utf8', flag: 'r'});
+    const sfxArray: number[][] = JSON.parse(sfxFile);
+    this.data.sfx = sfxArray.map(a => numberArrayToString(a));
   }
 
   readMusic = () => {
-    const mapFile = fs.readFileSync(path.join(this.baseDir, 'src/music', `${this.filename.slice(0,-3)}_music.json`), {encoding: 'utf8', flag: 'r'});
-    const mapArray: number[][] = JSON.parse(mapFile);
-    this.data.map = mapArray.map(a => numberArrayToString(a));
+    const musicFile = fs.readFileSync(path.join(this.baseDir, 'src/music', `${this.filename.slice(0,-3)}_music.json`), {encoding: 'utf8', flag: 'r'});
+    const musicArray: number[][] = JSON.parse(musicFile);
+    this.data.music = musicArray.map(a => numberArrayToString(a));
   }
 
   pack = async () => {
@@ -149,6 +151,7 @@ class Cart {
     if(fs.existsSync(path.join(this.baseDir, this.filename))) fs.copyFileSync(path.join(this.baseDir, this.filename), path.join(this.baseDir, 'backup', `${this.filename.slice(0,-3)}-${date}.p8`));
     
     await this.readIn();
+    console.log({data: this.data});
     const outFile: string[] = [];
     outFile.push(header);
     outFile.push(luaHeader);
