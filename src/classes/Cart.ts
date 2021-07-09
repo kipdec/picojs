@@ -127,7 +127,6 @@ class Cart {
 
   readMap = () => {
     const mapFile = fs.readFileSync(path.join(this.baseDir, 'src/map', `${this.filename.slice(0,-3)}_map.json`), {encoding: 'utf8', flag: 'r'});
-    console.log({mapFile});
     const mapArray: number[][] = JSON.parse(mapFile);
     this.data.map = mapArray.map(a => numberArrayToString(a));
   }
@@ -151,7 +150,6 @@ class Cart {
     if(fs.existsSync(path.join(this.baseDir, this.filename))) fs.copyFileSync(path.join(this.baseDir, this.filename), path.join(this.baseDir, 'backup', `${this.filename.slice(0,-3)}-${date}.p8`));
     
     await this.readIn();
-    console.log({data: this.data});
     const outFile: string[] = [];
     outFile.push(header);
     outFile.push(luaHeader);
