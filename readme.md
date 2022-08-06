@@ -4,11 +4,16 @@ PicoJS is a tool to 'pack' and 'unpack' .p8 files so that you can more easily wo
 
 ## Installation
 
-Assuming you have node installed:
+### Conditions
+1. node has to be installed (check with `node -v`) and if needed get it [here](https://nodejs.org/en/download/)
+2. once node is installed typescript needs to be installed locally run `npm install -g typescript`
 
-1. `npm install`
-2. `tsc` 
-3. `npm link`
+### Install picojs as a terminal tool
+1. download the source code
+2. open a terminal at the ``picojs` location
+3. run `npm install` (a node_module folder apears after some time)
+4. run `tsc` (the dest folder is generated)
+3. `npm link`(make the tool available on your global system)
 
 Following these steps should link the generated `dest/app.js` to the command `picojs`
 
